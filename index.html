@@ -1,0 +1,2949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
+    <title>记单词 · 旗舰触屏 · 生词本/发音/隐藏</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /*========== 全局样式 ========== 极致完整版 无任何删减 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+        }
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --success-color: #4cc9f0;
+            --warning-color: #f8961e;
+            --danger-color: #e63946;
+            --familiar-color: #2a9d8f;
+            --unfamiliar-color: #e76f51;
+            --somewhat-color: #f8961e;
+            --mastered-color: #4361ee;
+            --collection-color: #9c89b8;
+            --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+            --transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1);
+            --border-radius-card: 28px;
+            --border-radius-btn: 50px;
+            --border-radius-sm: 16px;
+        }
+
+        body {
+            background: linear-gradient(145deg, #edf2fb 0%, #e2eafc 100%);
+            color: var(--dark-color);
+            min-height: 100vh;
+            padding: 18px 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 12px 8px;
+            animation: fadeIn 0.7s ease;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            font-size: 2.6rem;
+            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+            text-shadow: 0 4px 8px rgba(58,12,163,0.08);
+        }
+
+        .subtitle {
+            font-size: 1.18rem;
+            color: var(--gray-color);
+            font-weight: 400;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 搜索框 */
+        .search-container {
+            position: relative;
+            margin-bottom: 32px;
+            animation: slideUp 0.6s;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px 24px;
+            border-radius: 60px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 1.2rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+            .search-box:focus {
+                outline: none;
+                box-shadow: 0 10px 25px rgba(67,97,238,0.2);
+                border-color: var(--primary-color);
+            }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-top: 12px;
+            overflow: hidden;
+            z-index: 100;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+
+            .search-results.expanded {
+                max-height: 80vh;
+                opacity: 1;
+            }
+
+        .search-result-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+
+        /* 模式卡片网格 */
+        .mode-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 26px;
+            margin-bottom: 50px;
+        }
+
+        .mode-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-card);
+            padding: 36px 20px 30px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.5);
+            animation: slideUp 0.6s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+            .mode-card:hover {
+                transform: translateY(-12px);
+                box-shadow: 0 30px 45px rgba(67,97,238,0.15);
+                border-color: var(--primary-color);
+                background: white;
+            }
+
+        .mode-icon {
+            font-size: 4.2rem;
+            margin-bottom: 18px;
+            color: var(--primary-color);
+            transition: 0.2s;
+        }
+
+        .mode-card:nth-child(2) .mode-icon {
+            color: var(--accent-color);
+        }
+
+        .mode-card:nth-child(3) .mode-icon {
+            color: var(--familiar-color);
+        }
+
+        .mode-card:nth-child(4) .mode-icon {
+            color: var(--collection-color);
+        }
+
+        .mode-card h2 {
+            font-size: 1.9rem;
+            margin-bottom: 14px;
+            color: var(--dark-color);
+            font-weight: 700;
+        }
+
+        .mode-card p {
+            color: var(--gray-color);
+            line-height: 1.6;
+            margin-bottom: 28px;
+            padding: 0 6px;
+            font-size: 1rem;
+        }
+
+        .mode-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: var(--border-radius-btn);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 14px rgba(67,97,238,0.25);
+            width: fit-content;
+        }
+
+        .mode-card:nth-child(2) .mode-btn {
+            background: var(--accent-color);
+            box-shadow: 0 6px 14px rgba(247,37,133,0.25);
+        }
+
+        .mode-card:nth-child(3) .mode-btn {
+            background: var(--familiar-color);
+            box-shadow: 0 6px 14px rgba(42,157,143,0.25);
+        }
+
+        .mode-card:nth-child(4) .mode-btn {
+            background: var(--collection-color);
+            box-shadow: 0 6px 14px rgba(156,137,184,0.35);
+        }
+
+        .mode-btn:hover {
+            transform: scale(1.06);
+            filter: brightness(1.08);
+        }
+
+        /* 公共头部返回 */
+        .back-btn {
+            background: var(--gray-color);
+            color: white;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 50px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+            .back-btn:hover {
+                background: var(--dark-color);
+                transform: translateX(-6px);
+            }
+
+        /* 教材卡片 */
+        .textbooks-container, .units-container, .words-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .textbook-card, .unit-card {
+            background: white;
+            border-radius: 22px;
+            padding: 26px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+            transition: 0.25s;
+            cursor: pointer;
+            border-left: 7px solid var(--primary-color);
+            border-top: 1px solid rgba(0,0,0,0.02);
+        }
+
+            .textbook-card:hover, .unit-card:hover {
+                transform: translateY(-7px);
+                box-shadow: 0 20px 30px rgba(67,97,238,0.1);
+            }
+
+        .unit-card {
+            border-left-color: var(--accent-color);
+        }
+
+        /* 单词卡片通用 (含发音) */
+        .word-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 22px rgba(0,0,0,0.04);
+            transition: 0.2s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .word-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at center, rgba(67,97,238,0.1) 0%, transparent 70%);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .word-card:hover::before {
+                opacity: 1;
+            }
+
+            .word-card:hover {
+                transform: scale(1.03);
+                box-shadow: 0 15px 30px rgba(67,97,238,0.12);
+            }
+
+        .word-header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .word {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+
+        .pronounce-btn {
+            background: rgba(67,97,238,0.08);
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 1rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+            .pronounce-btn:hover {
+                background: var(--primary-color);
+                color: white;
+            }
+
+        .word-source {
+            background: var(--light-color);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+
+        .basic-meaning {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            color: var(--dark-color);
+        }
+
+        /* 漫游核心区 */
+        .wander-info {
+            background: white;
+            border-radius: 28px;
+            padding: 24px 28px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.02);
+        }
+
+        .wander-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
+
+        .wander-controls {
+            display: flex;
+            gap: 14px;
+        }
+
+        .control-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+            .control-btn:hover {
+                background: var(--primary-color);
+                color: white;
+            }
+
+        /* 漫游卡片容器 */
+        .wander-card-container {
+            position: relative;
+            height: 580px;
+            margin-bottom: 40px;
+            perspective: 1200px;
+            touch-action: pan-y;
+        }
+
+        .wander-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 36px;
+            box-shadow: 0 30px 55px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s cubic-bezier(0.15, 0.9, 0.3, 1.1), opacity 0.3s;
+            cursor: grab;
+            user-select: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            will-change: transform, opacity;
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(2px);
+        }
+
+            .wander-card:active {
+                cursor: grabbing;
+            }
+
+        .wander-word {
+            font-size: 3.8rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 8px;
+            line-height: 1.1;
+        }
+
+        .wander-source {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            background: rgba(247,37,133,0.06);
+            padding: 8px 24px;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 0 auto 10px;
+        }
+
+        .wander-meaning {
+            font-size: 2rem;
+            text-align: center;
+            margin: 20px 0 25px;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        /* 标记按钮 超大触屏区 */
+        .word-marking {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0 20px;
+            flex-wrap: wrap;
+            pointer-events: auto;
+            z-index: 30;
+        }
+
+        .mark-btn {
+            padding: 14px 26px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 1.05rem;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.06);
+            pointer-events: auto !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mark-unfamiliar {
+            background: var(--unfamiliar-color);
+        }
+
+        .mark-somewhat {
+            background: var(--somewhat-color);
+        }
+
+        .mark-familiar {
+            background: var(--familiar-color);
+        }
+
+        .mark-mastered {
+            background: var(--mastered-color);
+        }
+
+        .mark-btn:hover {
+            transform: translateY(-4px);
+            filter: brightness(1.06);
+        }
+
+        .mark-status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            margin-top: 10px;
+            font-weight: 600;
+            background: #f1f5f9;
+        }
+
+        /* 隐藏模式类 */
+        .hide-meaning .wander-meaning,
+        .hide-meaning .basic-meaning,
+        .hide-meaning .history-word-meaning,
+        .hide-meaning .word-meaning-part {
+            display: none !important;
+        }
+
+        .hide-word .wander-word,
+        .hide-word .word,
+        .hide-word .history-word {
+            display: none !important;
+        }
+
+        /* 进度点 */
+        .wander-progress {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 20px 0 30px;
+        }
+
+        .progress-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #d1d5db;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+            .progress-dot.active {
+                background: var(--accent-color);
+                transform: scale(1.4);
+            }
+
+        /* ========== 历史记录 全新超美UI ========== */
+        .history-controls {
+            background: white;
+            border-radius: 30px;
+            padding: 24px 28px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+        }
+
+        .history-filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 22px;
+            border-radius: 40px;
+            border: 2px solid var(--gray-color);
+            background: white;
+            color: var(--gray-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+            .filter-btn.active {
+                background: var(--primary-color);
+                border-color: var(--primary-color);
+                color: white;
+            }
+
+        .history-stats {
+            background: white;
+            border-radius: 30px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.02);
+        }
+
+        .history-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .history-stat {
+            background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+            padding: 20px;
+            border-radius: 22px;
+            text-align: center;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .history-stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .history-stat-label {
+            color: var(--gray-color);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* 历史单词卡片 ———— 极致美工 */
+        .history-words-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 28px;
+        }
+
+        .history-word-card {
+            background: white;
+            border-radius: 28px;
+            padding: 26px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.04);
+            transition: 0.25s;
+            border-left: 10px solid var(--gray-color);
+            position: relative;
+            backdrop-filter: blur(6px);
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid rgba(255,255,255,0.6);
+        }
+
+            .history-word-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 25px 40px rgba(67,97,238,0.08);
+            }
+
+            .history-word-card.unfamiliar {
+                border-left-color: var(--unfamiliar-color);
+            }
+
+            .history-word-card.somewhat {
+                border-left-color: var(--somewhat-color);
+            }
+
+            .history-word-card.familiar {
+                border-left-color: var(--familiar-color);
+            }
+
+            .history-word-card.mastered {
+                border-left-color: var(--mastered-color);
+            }
+
+            .history-word-card.selected {
+                box-shadow: 0 0 0 4px var(--primary-color), 0 12px 28px rgba(0,0,0,0.1);
+            }
+
+        .history-word-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .history-word {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1.1;
+        }
+
+        .history-status {
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .status-badge-unfamiliar {
+            background: var(--unfamiliar-color);
+        }
+
+        .status-badge-somewhat {
+            background: var(--somewhat-color);
+        }
+
+        .status-badge-familiar {
+            background: var(--familiar-color);
+        }
+
+        .status-badge-mastered {
+            background: var(--mastered-color);
+        }
+
+        .history-word-source {
+            background: #f1f5f9;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #475569;
+            display: inline-block;
+            width: fit-content;
+            margin-bottom: 12px;
+        }
+
+        .history-word-meaning {
+            font-size: 1.4rem;
+            margin: 10px 0 12px;
+            color: #1e293b;
+            font-weight: 600;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 16px;
+        }
+
+        .history-word-details {
+            background: #f8fafc;
+            padding: 16px 18px;
+            border-radius: 20px;
+            color: #334155;
+            font-size: 0.98rem;
+            margin: 12px 0 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .history-word-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            border-top: 1px solid #e9eef3;
+            padding-top: 16px;
+        }
+
+        .history-view-count {
+            background: #f1f5f9;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .action-btn {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            padding: 8px 18px;
+            border-radius: 30px;
+            transition: 0.2s;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .action-btn:hover {
+                background: #e2e8f0;
+                color: #0f172a;
+            }
+
+        /* 批量操作条 */
+        .batch-actions {
+            background: white;
+            border-radius: 60px;
+            padding: 14px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            border: 1px solid #f1f5f9;
+        }
+
+        .selected-count {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .batch-btn {
+            padding: 10px 22px;
+            border-radius: 40px;
+            border: none;
+            background: #e2e8f0;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ========== 生词本专用 ========== */
+        .collection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: white;
+            padding: 20px 28px;
+            border-radius: 30px;
+        }
+
+        /* 模态框炫酷设计 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 48px;
+            padding: 36px;
+            max-width: 750px;
+            width: 94%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 50px 80px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+            .modal-content h3 {
+                font-size: 2.2rem;
+                color: var(--secondary-color);
+                margin-bottom: 24px;
+            }
+
+        .section-selector {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .section-btn {
+            padding: 12px 28px;
+            border-radius: 60px;
+            border: 2px solid var(--gray-color);
+            background: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+            .section-btn.active {
+                background: var(--primary-color);
+                border-color: var(--primary-color);
+                color: white;
+            }
+
+        .word-checkbox-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 14px;
+            background: #fafcff;
+        }
+
+        .word-check-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+            .word-check-item label {
+                margin-left: 14px;
+                flex: 1;
+                font-size: 1.1rem;
+            }
+
+        /* 学习状态吐司 */
+        .learning-status {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            border-radius: 60px;
+            padding: 16px 30px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 3500;
+            border-left: 6px solid var(--success-color);
+            backdrop-filter: blur(10px);
+        }
+
+        /* 单词详情页 */
+        .word-detail-page {
+            background: white;
+            border-radius: 36px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .detail-word {
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1.1;
+        }
+
+        .detail-pronunciation {
+            font-size: 1.4rem;
+            color: var(--gray-color);
+            margin-top: 8px;
+        }
+
+        .detail-about {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .detail-about:hover {
+                background: var(--secondary-color);
+            }
+
+        .detail-section {
+            margin-bottom: 30px;
+        }
+
+            .detail-section h4 {
+                font-size: 1.4rem;
+                color: var(--secondary-color);
+                margin-bottom: 16px;
+                padding-bottom: 8px;
+                border-bottom: 2px solid #e2e8f0;
+            }
+
+        .detail-item {
+            background: #f8fafc;
+            padding: 12px 18px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* 漫游设置模态框 */
+        .settings-section {
+            margin-bottom: 30px;
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 28px;
+        }
+
+            .settings-section h3 {
+                margin-bottom: 16px;
+                display: flex;
+                gap: 8px;
+                color: var(--secondary-color);
+            }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .settings-label {
+            flex: 1;
+            font-size: 1.1rem;
+        }
+
+        .settings-input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+            font-size: 1rem;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-value {
+            min-width: 40px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 卡片动画 */
+        .card-expand-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 4000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 24px;
+            transform-origin: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .wander-word {
+                font-size: 2.8rem;
+            }
+
+            .wander-meaning {
+                font-size: 1.6rem;
+            }
+
+            .mark-btn {
+                padding: 12px 18px;
+                font-size: 0.9rem;
+            }
+
+            .search-box {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ========== 主页 ========== -->
+        <header id="main-header">
+            <h1>📘 触屏·单词</h1>
+            <p class="subtitle">滑动学习 · 生词本 · 发音 · 隐藏中英</p>
+        </header>
+
+        <!-- 搜索框 -->
+        <div class="search-container">
+            <input type="text" id="global-search" class="search-box" placeholder="🔍 输入单词搜索...">
+            <div class="search-results" id="search-results">
+                <div class="search-result-card" id="search-result-content">
+                    <!-- 搜索结果将在这里显示 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 五大模式卡片 -->
+        <div class="mode-selection" id="mode-selection">
+            <!-- 卡片1: 单元查词 -->
+            <div class="mode-card" id="unit-mode-btn">
+                <div class="mode-icon"><i class="fas fa-book-open"></i></div>
+                <h2>按单元查词</h2>
+                <p>教材单元顺序学习 · 音标发音 · 进度记忆</p>
+                <button class="mode-btn"><i class="fas fa-play"></i> 开始学习</button>
+            </div>
+            <!-- 卡片2: 单词漫游 (核心) -->
+            <div class="mode-card" id="wander-mode-btn">
+                <div class="mode-icon"><i class="fas fa-random"></i></div>
+                <h2>单词漫游</h2>
+                <p>智能权重 · 滑动爽感 · 隐藏中英 · 数量可调</p>
+                <button class="mode-btn"><i class="fas fa-walking"></i> 开始漫游</button>
+            </div>
+            <!-- 卡片3: 历史记录(新UI) -->
+            <div class="mode-card" id="history-mode-btn">
+                <div class="mode-icon"><i class="fas fa-history"></i></div>
+                <h2>历史记录</h2>
+                <p>学习轨迹 · 精美卡片 · 批量管理 · 统计</p>
+                <button class="mode-btn"><i class="fas fa-list"></i> 查看历史</button>
+            </div>
+            <!-- 卡片4: 生词本 / 自定义收藏 (全新) -->
+            <div class="mode-card custom-collection-card" id="custom-collection-btn">
+                <div class="mode-icon"><i class="fas fa-star"></i></div>
+                <h2>📚 生词本</h2>
+                <p>从教材/历史多选添加，自建专属词库漫游</p>
+                <button class="mode-btn" style="background: #9c89b8;"><i class="fas fa-layer-group"></i> 编辑生词本</button>
+            </div>
+        </div>
+
+        <!-- ========== 单元查词模式 ========== -->
+        <div class="unit-mode" id="unit-mode" style="display: none;">
+            <button class="back-btn" id="unit-back-btn"><i class="fas fa-arrow-left"></i> 返回主页</button>
+            <h2 style="margin-bottom: 24px;">📖 选择教材</h2>
+            <div class="textbooks-container" id="textbooks-container"></div>
+            <div id="units-container" style="display: none;">
+                <h2 id="units-title" style="margin-bottom: 24px;"></h2>
+                <div class="units-container" id="units-list"></div>
+            </div>
+            <div id="words-container" style="display: none;">
+                <h2 id="words-title" style="margin-bottom: 24px;"></h2>
+                <div class="words-container" id="words-list"></div>
+            </div>
+            <!-- 单词详情页 -->
+            <div class="word-detail-page" id="word-detail-page">
+                <div class="detail-header">
+                    <div>
+                        <div class="detail-word" id="detail-word"></div>
+                        <div class="detail-pronunciation" id="detail-pronunciation"></div>
+                    </div>
+                    <button class="detail-about" id="detail-about-btn"><i class="fas fa-info-circle"></i> 关于</button>
+                </div>
+                <div id="detail-content">
+                    <!-- 详情内容将在这里显示 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 单词漫游模式 ========== 滑动/发音/隐藏全集成 -->
+        <div class="wander-mode" id="wander-mode" style="display: none;">
+            <button class="back-btn" id="wander-back-btn"><i class="fas fa-arrow-left"></i> 返回主页</button>
+            <div class="wander-info">
+                <div>
+                    <h2 style="margin-bottom: 6px;" id="wander-title">✨ 单词漫游</h2>
+                    <p id="wander-description" style="color: var(--gray-color);">左右滑动切换，下滑返回</p>
+                </div>
+                <div class="wander-stats">
+                    <div class="stat"><div class="stat-value" id="current-card">1</div><div class="stat-label">当前</div></div>
+                    <div class="stat"><div class="stat-value" id="total-card-count">20</div><div class="stat-label">总数</div></div>
+                    <div class="stat"><div class="stat-value" id="learned-count">0</div><div class="stat-label">已标记</div></div>
+                </div>
+                <div class="wander-controls">
+                    <button class="control-btn" id="shuffle-btn"><i class="fas fa-random"></i> 新词</button>
+                    <button class="control-btn" id="settings-btn"><i class="fas fa-cog"></i> 设置</button>
+                </div>
+            </div>
+            <!-- 卡片容器 -->
+            <div class="wander-card-container" id="wander-card-container"></div>
+            <div class="wander-progress" id="wander-progress"></div>
+        </div>
+
+        <!-- ========== 历史记录模式 ========== 全新UI全功能 -->
+        <div class="history-mode" id="history-mode" style="display: none;">
+            <button class="back-btn" id="history-back-btn"><i class="fas fa-arrow-left"></i> 返回主页</button>
+            <!-- 批量操作栏 -->
+            <div class="batch-actions" id="batch-actions" style="display: none;">
+                <div class="selected-count" id="selected-count">已选择 0 个单词</div>
+                <div class="batch-buttons">
+                    <button class="batch-btn" id="select-all-btn"><i class="fas fa-check-square"></i> 全选</button>
+                    <button class="batch-btn" id="select-none-btn"><i class="fas fa-square"></i> 全不选</button>
+                    <button class="batch-btn batch-delete" id="batch-delete-btn"><i class="fas fa-trash"></i> 批量删除</button>
+                </div>
+            </div>
+            <div class="history-controls">
+                <h2 style="font-size: 1.9rem;">📅 学习历史</h2>
+                <div class="history-filters" id="history-filters">
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="unfamiliar">陌生</button>
+                    <button class="filter-btn" data-filter="somewhat">有点熟</button>
+                    <button class="filter-btn" data-filter="familiar">熟悉</button>
+                    <button class="filter-btn" data-filter="mastered">掌握</button>
+                </div>
+            </div>
+            <!-- 统计区 -->
+            <div class="history-stats" id="history-stats"></div>
+            <!-- 历史单词卡片网格 -->
+            <div class="history-words-container" id="history-words-container"></div>
+        </div>
+
+        <!-- ========== 生词本模式 (自定义收藏) ========== -->
+        <div class="wander-mode" id="collection-mode" style="display: none;">
+            <button class="back-btn" id="collection-back-btn"><i class="fas fa-arrow-left"></i> 返回主页</button>
+            <div class="collection-header">
+                <h2 style="font-size: 2rem; color: var(--collection-color);"><i class="fas fa-star"></i> 我的生词本</h2>
+                <button class="control-btn" id="add-to-collection-btn" style="background: var(--collection-color); color: white; border: none;">
+                    <i class="fas fa-plus-circle"></i> 添加单词
+                </button>
+            </div>
+            <div style="background: white; border-radius: 28px; padding: 22px 28px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+                <div><span style="font-weight: 700; font-size: 1.4rem;">📦 当前词库数量</span> <strong id="collection-count" style="font-size: 2.2rem; color: var(--collection-color); margin-left: 12px;">0</strong></div>
+                <div style="display: flex; gap: 16px;">
+                    <button id="start-learn-collection" class="mode-btn" style="background: var(--collection-color);"><i class="fas fa-play"></i> 漫游生词本</button>
+                    <button id="clear-collection" class="mode-btn" style="background: var(--gray-color);"><i class="fas fa-trash-alt"></i> 清空</button>
+                </div>
+            </div>
+            <!-- 生词本单词列表 -->
+            <div class="history-words-container" id="collection-words-list"></div>
+        </div>
+
+        <!-- ========== 漫游设置模态框（全功能） ========== -->
+        <div id="wander-settings-modal" class="modal">
+            <div class="modal-content">
+                <h2 style="display: flex; gap: 12px;"><i class="fas fa-sliders-h"></i> 漫游设置</h2>
+
+                <!-- 每次随机单词数量 -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-hashtag"></i> 每日单词数</h3>
+                    <div class="settings-row">
+                        <div class="slider-container">
+                            <input type="range" id="wander-count-slider" min="5" max="50" value="20" class="settings-input" style="flex: 1;">
+                            <span id="wander-count-value" class="slider-value">20</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 隐藏中/英文 -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-eye-slash"></i> 隐藏模式</h3>
+                    <div class="settings-row">
+                        <label class="settings-label">
+                            <input type="checkbox" id="hide-chinese-checkbox"> 隐藏中文释义
+                        </label>
+                    </div>
+                    <div class="settings-row">
+                        <label class="settings-label">
+                            <input type="checkbox" id="hide-english-checkbox"> 隐藏英文单词
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 防重复 -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-repeat"></i> 防重复</h3>
+                    <div class="settings-row">
+                        <label class="settings-label">
+                            <input type="checkbox" id="prevent-recent" checked> 避免最近看过的单词
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 权重滑块 -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-weight-hanging"></i> 出现概率权重</h3>
+                    <div class="settings-row">
+                        <div class="slider-container" style="width: 100%;">
+                            <span>陌生</span>
+                            <input type="range" id="slider-unfamiliar" min="10" max="70" value="50" class="settings-input" style="flex: 1;">
+                            <span id="weight-unfamiliar" class="slider-value">50</span>%
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="slider-container" style="width: 100%;">
+                            <span>有点熟</span>
+                            <input type="range" id="slider-somewhat" min="10" max="70" value="25" class="settings-input" style="flex: 1;">
+                            <span id="weight-somewhat" class="slider-value">25</span>%
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="slider-container" style="width: 100%;">
+                            <span>熟悉</span>
+                            <input type="range" id="slider-familiar" min="10" max="70" value="15" class="settings-input" style="flex: 1;">
+                            <span id="weight-familiar" class="slider-value">15</span>%
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="slider-container" style="width: 100%;">
+                            <span>掌握</span>
+                            <input type="range" id="slider-mastered" min="10" max="70" value="10" class="settings-input" style="flex: 1;">
+                            <span id="weight-mastered" class="slider-value">10</span>%
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 20px;">
+                    <button id="settings-cancel" class="control-btn" style="background: var(--gray-color); border: none;"><i class="fas fa-times"></i> 取消</button>
+                    <button id="settings-save" class="control-btn" style="background: var(--primary-color); border: none;"><i class="fas fa-save"></i> 保存设置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 添加生词本模态框（多选教材/历史）========= -->
+        <div id="add-collection-modal" class="modal">
+            <div class="modal-content">
+                <h3 style="display: flex; gap: 12px;"><i class="fas fa-star" style="color: var(--collection-color);"></i> 添加到生词本</h3>
+                <!-- 切换选项卡 -->
+                <div class="section-selector">
+                    <button class="section-btn active" id="tab-textbook">📘 从教材选择</button>
+                    <button class="section-btn" id="tab-history">📅 从历史记录选择</button>
+                </div>
+                <!-- 教材选择区域 -->
+                <div id="textbook-select-area">
+                    <p style="font-weight: 600; margin-bottom: 10px;">1. 选择教材</p>
+                    <select id="select-textbook" style="width: 100%; padding: 14px; border-radius: 40px; border: 1px solid #ccc; margin-bottom: 18px;"></select>
+                    <p style="font-weight: 600; margin-bottom: 10px;">2. 选择单元</p>
+                    <select id="select-unit" style="width: 100%; padding: 14px; border-radius: 40px; border: 1px solid #ccc; margin-bottom: 20px;"></select>
+                    <p style="font-weight: 600; margin-bottom: 12px;">3. 勾选单词 (多选)</p>
+                    <div id="word-checkbox-list-container" class="word-checkbox-list"></div>
+                </div>
+                <!-- 历史选择区域 -->
+                <div id="history-select-area" style="display: none;">
+                    <p style="font-weight: 600; margin-bottom: 16px;">📌 从历史记录选择单词 (多选)</p>
+                    <div id="history-word-check-list" class="word-checkbox-list"></div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 20px; margin-top: 32px;">
+                    <button id="close-collection-modal" style="padding: 12px 28px; border: 2px solid #adb5bd; background: white; border-radius: 60px; font-weight: 600;">取消</button>
+                    <button id="confirm-add-collection" style="padding: 12px 36px; background: var(--collection-color); color: white; border: none; border-radius: 60px; font-weight: 700;"><i class="fas fa-check"></i> 确认添加</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 全局学习状态提示 -->
+        <div class="learning-status" id="learning-status" style="display: none;">
+            <i class="fas fa-check-circle" style="color: #2a9d8f; font-size: 1.6rem;"></i>
+            <span class="status-text" style="font-size: 1.1rem; font-weight: 500;"></span>
+        </div>
+    </div>
+
+    <script>
+        // ------------------------------------------------------------
+        // 第一部分 JS: 数据定义、全局变量、工具函数、存储、初始化等
+        // 完整无删减，与HTML完美嵌合
+        // ------------------------------------------------------------
+
+        // ----- 1. 全局词汇数据 -----
+        let vocabularyData = [];
+
+        // 模拟后备数据（包含pronunciation字段，符合新json结构）
+        function getFallbackData() {
+            return [
+                {
+                    "name": "必修第一册",
+                    "units": [
+                        {
+                            "name": "Welcome Unit",
+                            "vocabulary": [
+                                { "word": "exchange", "basic_meaning": "n. 交换；交流", "details": ["vt.交换；交流；交易；兑换"], "pronunciation": "/ɪksˈtʃeɪndʒ/" },
+                                { "word": "lecture", "basic_meaning": "n. 讲座；讲课；教训", "details": ["vi.（开）讲座；讲课", "vt.训斥"], "pronunciation": "/ˈlektʃə(r)/" },
+                                { "word": "slide", "basic_meaning": "v./n. 滑动", "details": ["vi. 滑动；滑落", "n. 幻灯片"], "pronunciation": "/slaɪd/" },
+                                { "word": "registration", "basic_meaning": "n. 登记；注册；挂号", "details": [], "pronunciation": "/ˌredʒɪˈstreɪʃən/" },
+                                { "word": "register", "basic_meaning": "vt.&vi. 登记；注册", "details": [], "pronunciation": "/ˈredʒɪstə(r)/" },
+                                { "word": "sex", "basic_meaning": "n. 性别", "details": [], "pronunciation": "/seks/" },
+                                { "word": "female", "basic_meaning": "adj. 女（性）的，雌的", "details": ["n. 雌性动（植）物；女子"], "pronunciation": "/ˈfiːmeɪl/" },
+                                { "word": "male", "basic_meaning": "adj. 男（性）的；雄的", "details": ["n. 雄性动（植）物；男子"], "pronunciation": "/meɪl/" },
+                                { "word": "nationality", "basic_meaning": "n. 国籍；民族", "details": [], "pronunciation": "/næʃəˈnælətɪ/" }
+                            ]
+                        }
+                    ]
+                }
+            ];
+        }
+
+        // 异步加载真实数据（若失败则使用后备）
+        async function loadVocabularyData() {
+            try {
+                const response = await fetch('vocabulary_fixed.json');
+                if (!response.ok) throw new Error('网络错误');
+                vocabularyData = await response.json();
+                console.log('✅ 词汇数据加载成功:', vocabularyData.length, '本教材');
+            } catch (error) {
+                console.warn('⚠️ 加载失败，使用内置演示数据（含发音）');
+                vocabularyData = getFallbackData();
+            }
+        }
+
+        // ----- 2. 状态变量 -----
+        let currentMode = 'home';              // home, unit, wander, history, collection
+        let currentTextbook = null;
+        let currentUnit = null;
+        let currentWordDetail = null;          // 当前查看的单词详情
+        let fromCollectionWander = false;      // 是否从生词本开始的漫游
+
+        // 漫游单词相关
+        let wanderWords = [];
+        let currentWanderIndex = 0;
+        let recentWords = [];                 // 最近20个单词key
+
+        // 单词掌握状态常量
+        const WORD_STATUS = {
+            UNFAMILIAR: 'unfamiliar',
+            SOMEWHAT: 'somewhat',
+            FAMILIAR: 'familiar',
+            MASTERED: 'mastered'
+        };
+
+        // 生词本集合 (存储wordKey)
+        let collectionSet = new Set();
+
+        // 漫游设置 (完整)
+        let wanderSettings = {
+            preventRecent: true,
+            wanderCount: 20,
+            hideChinese: false,
+            hideEnglish: false,
+            weights: {
+                [WORD_STATUS.UNFAMILIAR]: 50,
+                [WORD_STATUS.SOMEWHAT]: 25,
+                [WORD_STATUS.FAMILIAR]: 15,
+                [WORD_STATUS.MASTERED]: 10
+            }
+        };
+
+        // 学习历史记录 { wordKey : { status, viewCount, lastViewed, history[] } }
+        let wordHistory = {};
+
+        // 批量选择集合（历史记录页面）
+        let selectedWords = new Set();
+
+        // ----- 3. DOM 元素缓存 -----
+        const modeSelection = document.getElementById('mode-selection');
+        const unitModeDiv = document.getElementById('unit-mode');
+        const wanderModeDiv = document.getElementById('wander-mode');
+        const historyModeDiv = document.getElementById('history-mode');
+        const collectionModeDiv = document.getElementById('collection-mode');
+
+        const textbooksContainer = document.getElementById('textbooks-container');
+        const unitsContainer = document.getElementById('units-container');
+        const unitsList = document.getElementById('units-list');
+        const wordsContainer = document.getElementById('words-container');
+        const wordsList = document.getElementById('words-list');
+
+        const wanderCardContainer = document.getElementById('wander-card-container');
+        const wanderProgress = document.getElementById('wander-progress');
+        const currentCardElement = document.getElementById('current-card');
+        const totalCardElement = document.getElementById('total-card-count');
+        const learnedCountElement = document.getElementById('learned-count');
+
+        const learningStatus = document.getElementById('learning-status');
+        const statusText = document.querySelector('.learning-status .status-text');
+
+        const batchActions = document.getElementById('batch-actions');
+        const selectedCountSpan = document.getElementById('selected-count');
+
+        // 搜索相关元素
+        const globalSearch = document.getElementById('global-search');
+        const searchResults = document.getElementById('search-results');
+        const searchResultContent = document.getElementById('search-result-content');
+
+        // 详情页相关元素
+        const wordDetailPage = document.getElementById('word-detail-page');
+        const detailWord = document.getElementById('detail-word');
+        const detailPronunciation = document.getElementById('detail-pronunciation');
+        const detailContent = document.getElementById('detail-content');
+        const detailAboutBtn = document.getElementById('detail-about-btn');
+
+        // 漫游控制按钮
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+
+        // ----- 4. 发音函数 (有道API + 备选) -----
+        function playPronunciation(word, accent = 'us') {
+            if (!word) return;
+            // 有道词典API type=1 美音, type=2 英音
+            const type = accent === 'uk' ? 2 : 1;
+            const audioUrl = `https://dict.youdao.com/dictvoice?type=${type}&audio=${encodeURIComponent(word)}`;
+            const audio = new Audio(audioUrl);
+            audio.play().catch(err => {
+                // 备: 谷歌词典英音
+                const fallbackUrl = `https://ssl.gstatic.com/dictionary/static/sounds/oxford/${word}--_gb_1.mp3`;
+                const fallbackAudio = new Audio(fallbackUrl);
+                fallbackAudio.play().catch(e => {
+                    console.warn('发音失败', e);
+                    showLearningStatus('🔇 暂时无法发音');
+                });
+            });
+            showLearningStatus(`🔊 播放: ${word} (${accent === 'uk' ? '英式' : '美式'})`);
+        }
+
+        // 改进发音按钮：长按切换英式美式
+        function setupPronounceButton(button, word) {
+            let pressTimer = null;
+            let accent = 'us'; // 默认美式
+
+            button.addEventListener('mousedown', function () {
+                pressTimer = setTimeout(() => {
+                    accent = accent === 'us' ? 'uk' : 'us';
+                    const accentText = accent === 'uk' ? '英式' : '美式';
+                    showLearningStatus(`🔄 切换为${accentText}发音`);
+                }, 500); // 长按500ms切换
+            });
+
+            button.addEventListener('mouseup', function () {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+                playPronunciation(word, accent);
+            });
+
+            button.addEventListener('mouseleave', function () {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+            });
+
+            // 触摸设备支持
+            button.addEventListener('touchstart', function (e) {
+                pressTimer = setTimeout(() => {
+                    accent = accent === 'us' ? 'uk' : 'us';
+                    const accentText = accent === 'uk' ? '英式' : '美式';
+                    showLearningStatus(`🔄 切换为${accentText}发音`);
+                }, 500);
+            });
+
+            button.addEventListener('touchend', function (e) {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+                playPronunciation(word, accent);
+            });
+        }
+
+        // ----- 5. 通用工具函数 -----
+        // 生成单词唯一key
+        function getWordKey(word, textbookName, unitName) {
+            return `${textbookName}|${unitName}|${word.word}`;
+        }
+
+        // 获取状态中文
+        function getStatusText(status) {
+            const map = {
+                [WORD_STATUS.UNFAMILIAR]: '陌生',
+                [WORD_STATUS.SOMEWHAT]: '有点熟',
+                [WORD_STATUS.FAMILIAR]: '熟悉',
+                [WORD_STATUS.MASTERED]: '掌握'
+            };
+            return map[status] || '未知';
+        }
+
+        // 短暂学习提示
+        function showLearningStatus(msg) {
+            if (!learningStatus || !statusText) return;
+            statusText.textContent = msg;
+            learningStatus.style.display = 'flex';
+            clearTimeout(window.statusTimer);
+            window.statusTimer = setTimeout(() => {
+                learningStatus.style.display = 'none';
+            }, 2000);
+        }
+
+        // 获取单词详细信息（通过有道API）
+        async function getWordDetails(word) {
+            try {
+                // 使用有道词典API获取详细信息
+                const url = `https://dict.youdao.com/jsonapi?q=${encodeURIComponent(word)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                return data;
+            } catch (error) {
+                console.error('获取单词详情失败:', error);
+                return null;
+            }
+        }
+
+        // 格式化单词详情显示
+        function formatWordDetails(data) {
+            if (!data) return '<p>未能获取详细信息</p>';
+
+            let html = '';
+
+            // 基本释义
+            if (data.ec && data.ec.word) {
+                const wordInfo = data.ec.word[0];
+                html += `<div class="detail-section"><h4>基本释义</h4>`;
+                if (wordInfo.trs) {
+                    wordInfo.trs.forEach(tr => {
+                        html += `<div class="detail-item">${tr.pos} ${tr.tr[0].l.i[0]}</div>`;
+                    });
+                }
+                html += `</div>`;
+            }
+
+            // 网络释义
+            if (data.web_trans && data.web_trans.web) {
+                html += `<div class="detail-section"><h4>网络释义</h4>`;
+                data.web_trans.web.forEach(item => {
+                    html += `<div class="detail-item"><strong>${item.key}</strong>: ${item.trans.join('; ')}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            // 短语
+            if (data.phrs && data.phrs.phrs) {
+                html += `<div class="detail-section"><h4>常用短语</h4>`;
+                data.phrs.phrs.forEach(phr => {
+                    html += `<div class="detail-item"><strong>${phr.phr}</strong>: ${phr.translation}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            // 例句
+            if (data.blng_sents_part && data.blng_sents_part.sentence_part) {
+                html += `<div class="detail-section"><h4>双语例句</h4>`;
+                data.blng_sents_part.sentence_part.sentences.slice(0, 3).forEach(sent => {
+                    html += `<div class="detail-item"><em>${sent.src}</em><br>${sent.trans}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            return html || '<p>没有找到详细信息</p>';
+        }
+
+        // ----- 6. 存储操作 -----
+        function loadSettingsFromStorage() {
+            const s = localStorage.getItem('wanderSettings');
+            if (s) {
+                try {
+                    const parsed = JSON.parse(s);
+                    wanderSettings = { ...wanderSettings, ...parsed };
+                } catch (e) { }
+            }
+        }
+        function saveSettingsToStorage() {
+            localStorage.setItem('wanderSettings', JSON.stringify(wanderSettings));
+        }
+
+        function loadHistoryFromStorage() {
+            const s = localStorage.getItem('wordHistory');
+            if (s) {
+                try {
+                    wordHistory = JSON.parse(s);
+                } catch (e) { }
+            }
+        }
+        function saveHistoryToStorage() {
+            localStorage.setItem('wordHistory', JSON.stringify(wordHistory));
+        }
+
+        function loadCollectionFromStorage() {
+            const s = localStorage.getItem('collectionSet');
+            if (s) {
+                try {
+                    collectionSet = new Set(JSON.parse(s));
+                } catch (e) { }
+            }
+        }
+        function saveCollectionToStorage() {
+            localStorage.setItem('collectionSet', JSON.stringify(Array.from(collectionSet)));
+        }
+
+        // ------------------------------------------------------------
+
+        // ========== 8. DOMContentLoaded 启动器 ==========
+        document.addEventListener('DOMContentLoaded', async function () {
+            // 加载数据
+            await loadVocabularyData();
+
+            // ----- 主页模式卡片监听 -----
+            document.getElementById('unit-mode-btn').addEventListener('click', showUnitMode);
+            document.getElementById('wander-mode-btn').addEventListener('click', showWanderMode);
+            document.getElementById('history-mode-btn').addEventListener('click', showHistoryMode);
+            document.getElementById('custom-collection-btn').addEventListener('click', showCollectionMode);
+
+            // ----- 返回按钮监听 -----
+            document.getElementById('unit-back-btn').addEventListener('click', showHomeMode);
+            document.getElementById('wander-back-btn').addEventListener('click', showHomeMode);
+            document.getElementById('history-back-btn').addEventListener('click', showHomeMode);
+            document.getElementById('collection-back-btn').addEventListener('click', showHomeMode);
+
+            // ----- 漫游控制监听 -----
+            document.getElementById('shuffle-btn').addEventListener('click', generateWanderWords);
+            document.getElementById('settings-btn').addEventListener('click', showWanderSettings);
+            document.getElementById('settings-cancel').addEventListener('click', hideWanderSettings);
+            document.getElementById('settings-save').addEventListener('click', saveWanderSettings);
+
+            // ----- 历史记录批量监听 -----
+            document.getElementById('select-all-btn').addEventListener('click', selectAllWords);
+            document.getElementById('select-none-btn').addEventListener('click', selectNoneWords);
+            document.getElementById('batch-delete-btn').addEventListener('click', batchDeleteWords);
+
+            // ----- 历史过滤器委托监听 (动态绑定)-----
+            const historyFilters = document.getElementById('history-filters');
+            if (historyFilters) {
+                historyFilters.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('filter-btn')) {
+                        const filter = e.target.dataset.filter;
+                        loadHistoryDisplay(filter);
+                    }
+                });
+            }
+
+            // ----- 生词本相关监听 -----
+            document.getElementById('add-to-collection-btn').addEventListener('click', showAddCollectionModal);
+            document.getElementById('close-collection-modal').addEventListener('click', function () {
+                document.getElementById('add-collection-modal').style.display = 'none';
+            });
+            document.getElementById('confirm-add-collection').addEventListener('click', addSelectedWordsToCollection);
+            document.getElementById('tab-textbook').addEventListener('click', function () {
+                switchCollectionTab('textbook');
+            });
+            document.getElementById('tab-history').addEventListener('click', function () {
+                switchCollectionTab('history');
+            });
+            document.getElementById('start-learn-collection').addEventListener('click', startWanderFromCollection);
+            document.getElementById('clear-collection').addEventListener('click', function () {
+                if (confirm('确定清空整个生词本吗？')) {
+                    collectionSet.clear();
+                    saveCollectionToStorage();
+                    showCollectionWords();
+                    showLearningStatus('🗑️ 生词本已清空');
+                }
+            });
+
+            // ----- 漫游设置滑块联动 -----
+            ['unfamiliar', 'somewhat', 'familiar', 'mastered'].forEach(status => {
+                const slider = document.getElementById(`slider-${status}`);
+                const label = document.getElementById(`weight-${status}`);
+                if (slider) {
+                    slider.addEventListener('input', function () {
+                        label.textContent = this.value;
+                    });
+                }
+            });
+            // 单词数量滑块显示
+            const countSlider = document.getElementById('wander-count-slider');
+            const countValue = document.getElementById('wander-count-value');
+            if (countSlider) {
+                countSlider.addEventListener('input', function () {
+                    countValue.textContent = this.value;
+                });
+            }
+
+            // ----- 教材/单元下拉联动 (用于添加生词本) -----
+            const selectTextbook = document.getElementById('select-textbook');
+            if (selectTextbook) {
+                selectTextbook.addEventListener('change', function () {
+                    populateUnitDropdown();
+                    populateWordCheckboxList();
+                });
+            }
+            const selectUnit = document.getElementById('select-unit');
+            if (selectUnit) {
+                selectUnit.addEventListener('change', function () {
+                    populateWordCheckboxList();
+                });
+            }
+
+            // ----- 搜索框监听 -----
+            globalSearch.addEventListener('focus', function () {
+                if (this.value.trim() !== '') {
+                    searchResults.classList.add('expanded');
+                }
+            });
+
+            globalSearch.addEventListener('blur', function () {
+                // 延迟隐藏，让用户能点击结果
+                setTimeout(() => {
+                    searchResults.classList.remove('expanded');
+                }, 200);
+            });
+
+            globalSearch.addEventListener('input', async function () {
+                const query = this.value.trim();
+                if (query) {
+                    searchResults.classList.add('expanded');
+                    await performGlobalSearch(query);
+                } else {
+                    searchResults.classList.remove('expanded');
+                }
+            });
+
+            // ----- 详情页关于按钮监听 -----
+            if (detailAboutBtn) {
+                detailAboutBtn.addEventListener('click', async function () {
+                    if (currentWordDetail) {
+                        const details = await getWordDetails(currentWordDetail.word.word);
+                        if (details) {
+                            detailContent.innerHTML = formatWordDetails(details);
+                        } else {
+                            detailContent.innerHTML = '<p>未能获取详细信息</p>';
+                        }
+                    }
+                });
+            }
+
+            // ----- 从存储加载设置、历史、生词本 -----
+            loadSettingsFromStorage();
+            loadHistoryFromStorage();
+            loadCollectionFromStorage();
+
+            // ----- 初始化教材列表（单元查词）-----
+            initializeTextbooks();
+
+            // 默认显示主页
+            showHomeMode();
+        });
+
+        // ========== 9. 模式切换函数 ==========
+        function showHomeMode() {
+            currentMode = 'home';
+            modeSelection.style.display = 'grid';
+            unitModeDiv.style.display = 'none';
+            wanderModeDiv.style.display = 'none';
+            historyModeDiv.style.display = 'none';
+            collectionModeDiv.style.display = 'none';
+            // 重置单元查词显示状态
+            if (textbooksContainer) textbooksContainer.style.display = 'grid';
+            if (unitsContainer) unitsContainer.style.display = 'none';
+            if (wordsContainer) wordsContainer.style.display = 'none';
+            if (wordDetailPage) wordDetailPage.style.display = 'none';
+
+            // 重置漫游状态
+            fromCollectionWander = false;
+            if (shuffleBtn) shuffleBtn.style.display = 'inline-flex';
+            if (settingsBtn) settingsBtn.style.display = 'inline-flex';
+            if (document.getElementById('wander-title')) document.getElementById('wander-title').textContent = '✨ 单词漫游';
+        }
+
+        function showUnitMode() {
+            currentMode = 'unit';
+            modeSelection.style.display = 'none';
+            unitModeDiv.style.display = 'block';
+            wanderModeDiv.style.display = 'none';
+            historyModeDiv.style.display = 'none';
+            collectionModeDiv.style.display = 'none';
+            initializeTextbooks(); // 刷新列表
+        }
+
+        function showWanderMode() {
+            currentMode = 'wander';
+            modeSelection.style.display = 'none';
+            unitModeDiv.style.display = 'none';
+            wanderModeDiv.style.display = 'block';
+            historyModeDiv.style.display = 'none';
+            collectionModeDiv.style.display = 'none';
+            fromCollectionWander = false; // 从主页进入，不是从生词本
+            if (shuffleBtn) shuffleBtn.style.display = 'inline-flex';
+            if (settingsBtn) settingsBtn.style.display = 'inline-flex';
+            if (document.getElementById('wander-title')) document.getElementById('wander-title').textContent = '✨ 单词漫游';
+            generateWanderWords();  // 生成漫游单词
+        }
+
+        function showHistoryMode() {
+            currentMode = 'history';
+            modeSelection.style.display = 'none';
+            unitModeDiv.style.display = 'none';
+            wanderModeDiv.style.display = 'none';
+            historyModeDiv.style.display = 'block';
+            collectionModeDiv.style.display = 'none';
+            selectedWords.clear();
+            if (batchActions) batchActions.style.display = 'none';
+            loadHistoryDisplay('all');
+        }
+
+        function showCollectionMode() {
+            currentMode = 'collection';
+            modeSelection.style.display = 'none';
+            unitModeDiv.style.display = 'none';
+            wanderModeDiv.style.display = 'none';
+            historyModeDiv.style.display = 'none';
+            collectionModeDiv.style.display = 'block';
+            showCollectionWords();
+        }
+
+        // ========== 10. 搜索功能 ==========
+        async function performGlobalSearch(query) {
+            // 首先在本地词汇中搜索
+            const results = [];
+            vocabularyData.forEach(textbook => {
+                textbook.units.forEach(unit => {
+                    unit.vocabulary.forEach(wordObj => {
+                        if (wordObj.word.toLowerCase().includes(query.toLowerCase()) ||
+                            (wordObj.basic_meaning && wordObj.basic_meaning.toLowerCase().includes(query.toLowerCase()))) {
+                            results.push({
+                                word: wordObj,
+                                textbook: textbook.name,
+                                unit: unit.name
+                            });
+                        }
+                    });
+                });
+            });
+
+            // 显示本地搜索结果
+            if (results.length > 0) {
+                let html = '<div class="detail-header"><div class="detail-word">搜索结果: "' + query + '"</div></div>';
+                html += '<div class="history-words-container">';
+                results.slice(0, 10).forEach(result => { // 限制显示前10个
+                    html += `
+                                        <div class="history-word-card" style="cursor:pointer;" onclick="showWordDetail('${result.textbook}', '${result.unit}', ${JSON.stringify(result.word).replace(/'/g, '&quot;')})">
+                                            <div class="history-word">${result.word.word}</div>
+                                            <div class="history-word-source">${result.textbook} · ${result.unit}</div>
+                                            <div class="history-word-meaning">${result.word.basic_meaning || ''}</div>
+                                        </div>
+                                    `;
+                });
+                html += '</div>';
+                searchResultContent.innerHTML = html;
+            } else {
+                // 如果本地没有结果，尝试使用有道API
+                try {
+                    const apiResponse = await fetch(`https://dict.youdao.com/jsonapi?q=${encodeURIComponent(query)}`);
+                    const data = await apiResponse.json();
+
+                    if (data.ec && data.ec.word) {
+                        const wordInfo = data.ec.word[0];
+                        searchResultContent.innerHTML = `
+                                            <div class="detail-header">
+                                                <div>
+                                                    <div class="detail-word">${wordInfo.word[0]}</div>
+                                                    <div class="detail-pronunciation">${wordInfo.phonetic ? `[${wordInfo.phonetic}]` : ''}</div>
+                                                </div>
+                                                <button class="pronounce-btn" onclick="playPronunciation('${wordInfo.word[0]}')"><i class="fas fa-volume-up"></i> 发音</button>
+                                            </div>
+                                            <div class="detail-section">
+                                                <h4>释义</h4>
+                                                ${wordInfo.trs ? wordInfo.trs.map(tr => `<div class="detail-item">${tr.pos} ${tr.tr[0].l.i[0]}</div>`).join('') : '无释义'}
+                                            </div>
+                                        `;
+                    } else {
+                        searchResultContent.innerHTML = '<p>未找到相关结果</p>';
+                    }
+                } catch (error) {
+                    searchResultContent.innerHTML = '<p>搜索服务暂时不可用</p>';
+                }
+            }
+        }
+
+        // ========== 11. 单元查词完整功能 ==========
+        function initializeTextbooks() {
+            if (!textbooksContainer) return;
+            textbooksContainer.innerHTML = '';
+            vocabularyData.forEach((textbook) => {
+                const unitCount = textbook.units.length;
+                const totalWords = textbook.units.reduce((sum, u) => sum + u.vocabulary.length, 0);
+                const card = document.createElement('div');
+                card.className = 'textbook-card';
+                card.innerHTML = `<h3>${textbook.name}</h3><p>包含 ${unitCount} 个单元，共 ${totalWords} 个单词</p><span class="unit-count" style="background:var(--light-color); padding:6px 18px; border-radius:30px;">${unitCount} 单元</span>`;
+                card.addEventListener('click', () => showUnits(textbook));
+                textbooksContainer.appendChild(card);
+            });
+        }
+
+        function showUnits(textbook) {
+            currentTextbook = textbook;
+            textbooksContainer.style.display = 'none';
+            unitsContainer.style.display = 'block';
+            wordsContainer.style.display = 'none';
+            document.getElementById('units-title').textContent = `${textbook.name} - 单元列表`;
+            unitsList.innerHTML = '';
+            textbook.units.forEach((unit) => {
+                const card = document.createElement('div');
+                card.className = 'unit-card';
+                card.innerHTML = `<h4>${unit.name}</h4><p>${unit.vocabulary.length} 个单词</p><span class="word-count" style="background:var(--success-color); color:white; padding:4px 16px; border-radius:30px;">${unit.vocabulary.length} 词</span>`;
+                card.addEventListener('click', () => showWords(unit, textbook.name));
+                unitsList.appendChild(card);
+            });
+        }
+
+        function showWords(unit, textbookName) {
+            currentUnit = unit;
+            unitsContainer.style.display = 'none';
+            wordsContainer.style.display = 'block';
+            document.getElementById('words-title').textContent = `${textbookName} - ${unit.name}`;
+            wordsList.innerHTML = '';
+            unit.vocabulary.forEach((word) => {
+                const wordKey = getWordKey(word, textbookName, unit.name);
+                const history = wordHistory[wordKey];
+                const status = history ? history.status : WORD_STATUS.UNFAMILIAR;
+                const card = document.createElement('div');
+                card.className = 'word-card';
+
+                // 发音按钮
+                const pronBtn = document.createElement('button');
+                pronBtn.className = 'pronounce-btn';
+                pronBtn.innerHTML = `<i class="fas fa-volume-up"></i> 发音 ${word.pronunciation || ''}`;
+                setupPronounceButton(pronBtn, word.word); // 使用改进的发音按钮
+
+                const wordHeader = document.createElement('div');
+                wordHeader.className = 'word-header';
+                wordHeader.innerHTML = `<div class="word">${word.word}</div>`;
+                wordHeader.appendChild(pronBtn);
+                wordHeader.innerHTML += `<div class="word-source">${textbookName} · ${unit.name}</div>`;
+
+                let detailsHTML = '';
+                if (word.details && word.details.length) {
+                    detailsHTML = `<div class="details" style="margin-top:16px;"><h5 style="color:var(--gray-color);">详细释义：</h5>${word.details.map(d => `<div class="detail-item" style="background:var(--light-color); padding:10px; border-radius:12px; margin-bottom:6px;">${d}</div>`).join('')}</div>`;
+                }
+
+                let statusHTML = '';
+                if (history) {
+                    statusHTML = `<div class="mark-status status-${status}" style="margin-top:14px;">当前状态：${getStatusText(status)} (查看 ${history.viewCount || 0} 次)</div>`;
+                }
+
+                card.appendChild(wordHeader);
+                const meaningDiv = document.createElement('div');
+                meaningDiv.className = 'basic-meaning';
+                meaningDiv.textContent = word.basic_meaning || '';
+                card.appendChild(meaningDiv);
+                if (statusHTML) card.insertAdjacentHTML('beforeend', statusHTML);
+                if (detailsHTML) card.insertAdjacentHTML('beforeend', detailsHTML);
+
+                // 添加点击事件进入详情页
+                card.addEventListener('click', () => {
+                    showWordDetail(textbookName, unit.name, word);
+                });
+
+                wordsList.appendChild(card);
+            });
+        }
+
+        // 显示单词详情页
+        function showWordDetail(textbookName, unitName, word) {
+            currentWordDetail = { textbook: textbookName, unit: unitName, word: word };
+            wordsContainer.style.display = 'none';
+            wordDetailPage.style.display = 'block';
+
+            detailWord.textContent = word.word;
+            detailPronunciation.textContent = word.pronunciation ? `[${word.pronunciation}]` : '';
+
+            // 填充基本信息
+            detailContent.innerHTML = `
+                                <div class="detail-section">
+                                    <h4>基本释义</h4>
+                                    <div class="detail-item">${word.basic_meaning || '无释义'}</div>
+                                </div>
+                                ${word.details && word.details.length ? `
+                                <div class="detail-section">
+                                    <h4>详细释义</h4>
+                                    ${word.details.map(d => `<div class="detail-item">${d}</div>`).join('')}
+                                </div>` : ''}
+                                <div class="detail-section">
+                                    <h4>来源</h4>
+                                    <div class="detail-item">${textbookName} · ${unitName}</div>
+                                </div>
+                            `;
+        }
+
+        // 从详情页返回单词列表
+        function backToWordsList() {
+            if (currentUnit && currentTextbook) {
+                showWords(currentUnit, currentTextbook.name);
+            }
+        }
+
+        // ========== 12. 漫游核心引擎 (含权重选择、滑动、隐藏、发音) ==========
+        function generateWanderWords() {
+            const allWords = [];
+            // 判断是否从生词本漫游
+            let sourceCollection = fromCollectionWander && collectionSet.size > 0;
+
+            vocabularyData.forEach(textbook => {
+                textbook.units.forEach(unit => {
+                    unit.vocabulary.forEach(word => {
+                        const key = getWordKey(word, textbook.name, unit.name);
+                        // 如果是从生词本模式且该单词不在collectionSet中，跳过
+                        if (sourceCollection && !collectionSet.has(key)) return;
+
+                        const history = wordHistory[key];
+                        const status = history ? history.status : WORD_STATUS.UNFAMILIAR;
+                        allWords.push({
+                            ...word,
+                            textbook: textbook.name,
+                            unit: unit.name,
+                            key: key,
+                            status: status,
+                            weight: wanderSettings.weights[status] || 10
+                        });
+                    });
+                });
+            });
+
+            if (allWords.length === 0) {
+                showLearningStatus('📭 词库为空，无法漫游');
+                wanderWords = [];
+                createWanderCards();
+                return;
+            }
+
+            let availableWords = [...allWords];
+            if (wanderSettings.preventRecent && recentWords.length > 0) {
+                availableWords = availableWords.filter(w => !recentWords.includes(w.key));
+                if (availableWords.length < wanderSettings.wanderCount) {
+                    availableWords = [...allWords]; // 不足则忽略防重复
+                    showLearningStatus('⚠️ 可用词较少，已临时关闭防重复');
+                }
+            }
+
+            // 权重随机选择
+            wanderWords = weightedRandomSelection(availableWords, wanderSettings.wanderCount);
+            // 更新最近列表
+            recentWords = wanderWords.map(w => w.key);
+            if (recentWords.length > 30) recentWords = recentWords.slice(-30);
+
+            currentWanderIndex = 0;
+            if (totalCardElement) totalCardElement.textContent = wanderWords.length;
+            createWanderCards();
+            updateWanderProgress();
+            updateLearnedCount();
+        }
+
+        function weightedRandomSelection(words, count) {
+            if (words.length <= count) return words.slice(0, count);
+            const selected = [];
+            const pool = [...words];
+            while (selected.length < count && pool.length > 0) {
+                const totalWeight = pool.reduce((sum, w) => sum + (w.weight || 10), 0);
+                let rand = Math.random() * totalWeight;
+                for (let i = 0; i < pool.length; i++) {
+                    rand -= (pool[i].weight || 10);
+                    if (rand <= 0) {
+                        selected.push(pool[i]);
+                        pool.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+            return selected;
+        }
+
+        function createWanderCards() {
+            if (!wanderCardContainer) return;
+            wanderCardContainer.innerHTML = '';
+
+            wanderWords.forEach((word, idx) => {
+                const card = document.createElement('div');
+                card.className = 'wander-card';
+                card.dataset.index = idx;
+                card.dataset.wordKey = word.key;
+
+                card.style.opacity = idx === currentWanderIndex ? '1' : '0';
+                card.style.zIndex = idx === currentWanderIndex ? '10' : '1';
+                card.style.transform = 'translate(0,0) rotate(0deg)';
+                card.style.transition = 'opacity 0.35s, transform 0.4s cubic-bezier(0.15,0.9,0.3,1.1)';
+
+                // 应用隐藏设置
+                if (wanderSettings.hideChinese) card.classList.add('hide-meaning');
+                if (wanderSettings.hideEnglish) card.classList.add('hide-word');
+
+                const history = wordHistory[word.key];
+                const status = history ? history.status : WORD_STATUS.UNFAMILIAR;
+                const statusText = getStatusText(status);
+
+                // 发音按钮
+                const pronBtn = `<button class="pronounce-btn wander-pronounce" style="margin:0 auto 10px;" data-word="${word.word}"><i class="fas fa-volume-up"></i> 发音 ${word.pronunciation || ''}</button>`;
+
+                let detailsHTML = '';
+                if (word.details && word.details.length) {
+                    detailsHTML = `<div class="wander-details" style="background:#f8fafc; border-radius:24px; padding:18px; margin-top:12px;">${word.details.map(d => `<div style="padding:6px 0; border-bottom:1px solid #e2e8f0;">${d}</div>`).join('')}</div>`;
+                }
+
+                card.innerHTML = `
+                                    <div class="wander-card-header" style="text-align:center;">
+                                        <div class="wander-word">${word.word}</div>
+                                        ${pronBtn}
+                                        <div class="wander-source">${word.textbook} · ${word.unit}</div>
+                                    </div>
+                                    <div class="wander-meaning">${word.basic_meaning || ''}</div>
+                                    <div class="word-marking">
+                                        <button class="mark-btn mark-unfamiliar" data-status="${WORD_STATUS.UNFAMILIAR}"><i class="fas fa-question-circle"></i> 陌生</button>
+                                        <button class="mark-btn mark-somewhat" data-status="${WORD_STATUS.SOMEWHAT}"><i class="fas fa-meh"></i> 有点熟</button>
+                                        <button class="mark-btn mark-familiar" data-status="${WORD_STATUS.FAMILIAR}"><i class="fas fa-smile"></i> 熟悉</button>
+                                        <button class="mark-btn mark-mastered" data-status="${WORD_STATUS.MASTERED}"><i class="fas fa-star"></i> 掌握</button>
+                                    </div>
+                                    <div class="mark-status status-${status}">当前状态：${statusText} ${history ? `(查看 ${history.viewCount || 0} 次)` : ''}</div>
+                                    ${detailsHTML}
+                                `;
+
+                // 设置发音按钮
+                const pronBtnEl = card.querySelector('.wander-pronounce');
+                if (pronBtnEl) {
+                    setupPronounceButton(pronBtnEl, word.word); // 使用改进的发音按钮
+                }
+
+                // 标记按钮事件
+                card.querySelectorAll('.mark-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const newStatus = btn.dataset.status;
+                        markWordAs(word.key, newStatus);
+
+                        // 更新当前卡片的状态显示
+                        const statusDiv = card.querySelector('.mark-status');
+                        if (statusDiv) {
+                            statusDiv.className = `mark-status status-${newStatus}`;
+                            statusDiv.textContent = `当前状态：${getStatusText(newStatus)} ${history ? `(查看 ${history.viewCount || 0} 次)` : ''}`;
+                        }
+                    });
+                    btn.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: false });
+                });
+
+                // 记录查看次数
+                recordWordView(word.key);
+
+                // 绑定滑动监听
+                attachSwipeListeners(card, idx);
+
+                wanderCardContainer.appendChild(card);
+            });
+            if (currentCardElement) currentCardElement.textContent = currentWanderIndex + 1;
+        }
+
+        // 滑动监听（增强触屏版）
+        function attachSwipeListeners(card, cardIndex) {
+            let startX = 0, startY = 0, isDragging = false, offsetX = 0, offsetY = 0;
+
+            function onStart(e) {
+                if (cardIndex !== currentWanderIndex) return;
+                e.stopPropagation();
+                const touch = e.touches ? e.touches[0] : e;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                isDragging = true;
+                card.style.transition = 'none';
+            }
+
+            function onMove(e) {
+                if (!isDragging || cardIndex !== currentWanderIndex) return;
+                e.preventDefault();
+                e.stopPropagation();
+                const touch = e.touches ? e.touches[0] : e;
+                offsetX = touch.clientX - startX;
+                offsetY = touch.clientY - startY;
+                card.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${offsetX * 0.08}deg)`;
+                card.style.opacity = 1 - Math.min(Math.abs(offsetX) / 600, 0.4);
+            }
+
+            function onEnd(e) {
+                if (!isDragging || cardIndex !== currentWanderIndex) return;
+                isDragging = false;
+                card.style.transition = 'transform 0.4s, opacity 0.3s';
+
+                const absX = Math.abs(offsetX);
+                const absY = Math.abs(offsetY);
+                const threshold = 70;
+
+                if (absX > absY && absX > threshold) {
+                    if (offsetX > 0) {
+                        goPrevCard();  // 右滑：上一个
+                    } else {
+                        goNextCard();  // 左滑：下一个
+                    }
+                    const flyX = offsetX > 0 ? 450 : -450;
+                    card.style.transform = `translate(${flyX}px, ${offsetY}px) rotate(${offsetX * 0.2}deg)`;
+                    card.style.opacity = '0';
+                } else if (absY > absX && absY > threshold) {
+                    if (offsetY < 0) {
+                        goNextCard();  // 上滑：下一个
+                    } else {
+                        goPrevCard();  // 下滑：上一个
+                    }
+                    const flyY = offsetY > 0 ? 350 : -350;
+                    card.style.transform = `translate(${offsetX}px, ${flyY}px) rotate(${offsetX * 0.1}deg)`;
+                    card.style.opacity = '0';
+                } else {
+                    // 回弹
+                    card.style.transform = 'translate(0,0) rotate(0deg)';
+                    card.style.opacity = '1';
+                }
+                offsetX = 0; offsetY = 0;
+
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('mouseup', onEnd);
+                document.removeEventListener('touchend', onEnd);
+            }
+
+            card.addEventListener('mousedown', onStart);
+            card.addEventListener('touchstart', onStart, { passive: false });
+
+            const attachGlobal = function () {
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('touchmove', onMove, { passive: false });
+                document.addEventListener('mouseup', onEnd);
+                document.addEventListener('touchend', onEnd);
+            };
+
+            // 重新包装以保证全局监听注册
+            card.addEventListener('mousedown', function (e) { onStart(e); attachGlobal(); });
+            card.addEventListener('touchstart', function (e) { onStart(e); attachGlobal(); }, { passive: false });
+        }
+
+        function goNextCard() {
+            if (wanderWords.length === 0) return;
+            if (currentWanderIndex < wanderWords.length - 1) {
+                currentWanderIndex++;
+            } else {
+                currentWanderIndex = 0;
+            }
+            refreshCardsVisibility();
+        }
+
+        function goPrevCard() {
+            if (wanderWords.length === 0) return;
+            if (currentWanderIndex > 0) {
+                currentWanderIndex--;
+            } else {
+                currentWanderIndex = wanderWords.length - 1;
+            }
+            refreshCardsVisibility();
+        }
+
+        function refreshCardsVisibility() {
+            const cards = document.querySelectorAll('.wander-card');
+            cards.forEach((card, idx) => {
+                card.style.transition = 'opacity 0.35s, transform 0.4s';
+                if (idx === currentWanderIndex) {
+                    card.style.opacity = '1';
+                    card.style.zIndex = '10';
+                    card.style.transform = 'translate(0,0) rotate(0deg)';
+                } else {
+                    card.style.opacity = '0';
+                    card.style.zIndex = '1';
+                    card.style.transform = 'translate(0,0) rotate(0deg)';
+                }
+            });
+            if (currentCardElement) currentCardElement.textContent = currentWanderIndex + 1;
+            updateWanderProgress();
+            updateLearnedCount();
+        }
+
+        function updateWanderProgress() {
+            if (!wanderProgress) return;
+            wanderProgress.innerHTML = '';
+            wanderWords.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = `progress-dot ${i === currentWanderIndex ? 'active' : ''}`;
+                dot.addEventListener('click', () => {
+                    currentWanderIndex = i;
+                    refreshCardsVisibility();
+                });
+                wanderProgress.appendChild(dot);
+            });
+        }
+
+        function updateLearnedCount() {
+            if (!learnedCountElement) return;
+            const marked = wanderWords.filter(w => {
+                const h = wordHistory[w.key];
+                return h && h.status !== WORD_STATUS.UNFAMILIAR;
+            }).length;
+            learnedCountElement.textContent = marked;
+        }
+
+        // ----- 标记单词状态 -----
+        function markWordAs(wordKey, status) {
+            if (!wordHistory[wordKey]) {
+                wordHistory[wordKey] = {
+                    status: WORD_STATUS.UNFAMILIAR,
+                    viewCount: 0,
+                    lastViewed: null,
+                    history: []
+                };
+            }
+            wordHistory[wordKey].status = status;
+            wordHistory[wordKey].lastViewed = new Date().toISOString();
+            wordHistory[wordKey].history.push({
+                status: status,
+                timestamp: new Date().toISOString()
+            });
+            saveHistoryToStorage();
+            showLearningStatus(`✅ 标记为：${getStatusText(status)}`);
+
+            // 实时更新漫游卡片状态
+            if (currentMode === 'wander' || currentMode === 'collection') {
+                const currentCard = document.querySelector(`.wander-card[data-wordkey="${wordKey}"]`);
+                if (currentCard) {
+                    const statusDiv = currentCard.querySelector('.mark-status');
+                    if (statusDiv) {
+                        statusDiv.className = `mark-status status-${status}`;
+                        statusDiv.textContent = `当前状态：${getStatusText(status)} (查看 ${wordHistory[wordKey].viewCount || 0} 次)`;
+                    }
+                }
+                updateLearnedCount();
+            }
+            if (currentMode === 'history') loadHistoryDisplay();
+        }
+
+        function recordWordView(wordKey) {
+            if (!wordHistory[wordKey]) {
+                wordHistory[wordKey] = {
+                    status: WORD_STATUS.UNFAMILIAR,
+                    viewCount: 0,
+                    lastViewed: null,
+                    history: []
+                };
+            }
+            wordHistory[wordKey].viewCount = (wordHistory[wordKey].viewCount || 0) + 1;
+            wordHistory[wordKey].lastViewed = new Date().toISOString();
+            saveHistoryToStorage();
+        }
+
+        // ========== 13. 历史记录 完整UI与功能 ==========
+        function loadHistoryDisplay(filter = 'all') {
+            // 激活filter按钮
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+
+            const stats = calculateHistoryStats();
+            const statsGrid = document.getElementById('history-stats');
+            if (statsGrid) {
+                statsGrid.innerHTML = `<div class="history-stats-grid">
+                                    <div class="history-stat"><div class="history-stat-value">${stats.total}</div><div class="history-stat-label">总词</div></div>
+                                    <div class="history-stat"><div class="history-stat-value">${stats.totalViews}</div><div class="history-stat-label">查阅</div></div>
+                                    <div class="history-stat"><div class="history-stat-value">${stats.unfamiliar}</div><div class="history-stat-label">陌生</div></div>
+                                    <div class="history-stat"><div class="history-stat-value">${stats.somewhat}</div><div class="history-stat-label">有点熟</div></div>
+                                    <div class="history-stat"><div class="history-stat-value">${stats.familiar}</div><div class="history-stat-label">熟悉</div></div>
+                                    <div class="history-stat"><div class="history-stat-value">${stats.mastered}</div><div class="history-stat-label">掌握</div></div>
+                                </div>`;
+            }
+
+            displayHistoryWords(filter);
+        }
+
+        function calculateHistoryStats() {
+            const values = Object.values(wordHistory);
+            return {
+                total: values.length,
+                unfamiliar: values.filter(h => h.status === WORD_STATUS.UNFAMILIAR).length,
+                somewhat: values.filter(h => h.status === WORD_STATUS.SOMEWHAT).length,
+                familiar: values.filter(h => h.status === WORD_STATUS.FAMILIAR).length,
+                mastered: values.filter(h => h.status === WORD_STATUS.MASTERED).length,
+                totalViews: values.reduce((acc, h) => acc + (h.viewCount || 0), 0)
+            };
+        }
+
+        function displayHistoryWords(filter) {
+            const container = document.getElementById('history-words-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let wordItems = [];
+            vocabularyData.forEach(tb => {
+                tb.units.forEach(unit => {
+                    unit.vocabulary.forEach(word => {
+                        const key = getWordKey(word, tb.name, unit.name);
+                        if (wordHistory[key]) {
+                            wordItems.push({
+                                word,
+                                textbook: tb.name,
+                                unit: unit.name,
+                                key,
+                                history: wordHistory[key]
+                            });
+                        }
+                    });
+                });
+            });
+
+            if (filter !== 'all') {
+                wordItems = wordItems.filter(item => item.history.status === filter);
+            }
+
+            wordItems.sort((a, b) => new Date(b.history.lastViewed) - new Date(a.history.lastViewed));
+
+            if (wordItems.length === 0) {
+                container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:80px; background:white; border-radius:48px;">
+                                    <i class="fas fa-inbox" style="font-size:4rem; color:var(--gray-color);"></i>
+                                    <p style="margin-top:20px; font-size:1.3rem;">暂无记录</p>
+                                </div>`;
+                batchActions.style.display = 'none';
+                return;
+            }
+
+            // 显示批量操作栏
+            if (batchActions) batchActions.style.display = 'flex';
+            updateSelectedCount();
+
+            wordItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `history-word-card ${item.history.status} ${selectedWords.has(item.key) ? 'selected' : ''}`;
+                card.dataset.key = item.key;
+
+                const pronBtn = `<button class="pronounce-btn" data-word="${item.word.word}"><i class="fas fa-volume-up"></i> 发音</button>`;
+
+                let detailsShort = '';
+                if (item.word.details && item.word.details.length) {
+                    detailsShort = item.word.details.slice(0, 2).join('；') + (item.word.details.length > 2 ? '…' : '');
+                }
+
+                card.innerHTML = `
+                                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                                        <div style="display:flex; align-items:center; gap:10px;">
+                                            <input type="checkbox" class="word-checkbox" data-key="${item.key}" ${selectedWords.has(item.key) ? 'checked' : ''} style="width:22px; height:22px;">
+                                            <span class="history-word">${item.word.word}</span>
+                                        </div>
+                                        ${pronBtn}
+                                    </div>
+                                    <div style="display:flex; gap:12px; align-items:center; margin-top:6px;">
+                                        <span class="history-status status-badge-${item.history.status}">${getStatusText(item.history.status)}</span>
+                                        <span class="history-word-source">${item.textbook} · ${item.unit}</span>
+                                    </div>
+                                    <div class="history-word-meaning">${item.word.basic_meaning || ''}</div>
+                                    ${detailsShort ? `<div class="history-word-details">${detailsShort}</div>` : ''}
+                                    <div class="history-word-footer">
+                                        <span class="history-view-count"><i class="fas fa-eye"></i> 查看 ${item.history.viewCount || 0} 次</span>
+                                        <div>
+                                            <button class="action-btn action-reset" data-key="${item.key}"><i class="fas fa-undo-alt"></i> 重置</button>
+                                            <button class="action-btn action-delete" data-key="${item.key}"><i class="fas fa-trash"></i> 删除</button>
+                                        </div>
+                                    </div>
+                                `;
+
+                // 发音
+                card.querySelector('.pronounce-btn')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    playPronunciation(item.word.word);
+                });
+
+                // 复选框变更
+                const cb = card.querySelector('.word-checkbox');
+                if (cb) {
+                    setupPronounceButton(card.querySelector('.pronounce-btn'), item.word.word); // 设置改进的发音按钮
+                    cb.addEventListener('change', function (e) {
+                        e.stopPropagation();
+                        if (this.checked) {
+                            selectedWords.add(item.key);
+                            card.classList.add('selected');
+                        } else {
+                            selectedWords.delete(item.key);
+                            card.classList.remove('selected');
+                        }
+                        updateSelectedCount();
+                    });
+                }
+
+                // 重置按钮
+                card.querySelector('.action-reset')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    resetWordHistory(item.key);
+                });
+
+                // 删除按钮
+                card.querySelector('.action-delete')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteWordHistory(item.key);
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        function resetWordHistory(key) {
+            if (wordHistory[key]) {
+                wordHistory[key].status = WORD_STATUS.UNFAMILIAR;
+                wordHistory[key].history.push({
+                    status: WORD_STATUS.UNFAMILIAR,
+                    timestamp: new Date().toISOString()
+                });
+                saveHistoryToStorage();
+                loadHistoryDisplay();
+                showLearningStatus('🔄 已重置为陌生');
+            }
+        }
+
+        function deleteWordHistory(key) {
+            if (confirm('确定删除该单词的历史记录？')) {
+                delete wordHistory[key];
+                selectedWords.delete(key);
+                saveHistoryToStorage();
+                loadHistoryDisplay();
+                showLearningStatus('🗑️ 已删除');
+            }
+        }
+
+        // 批量选择
+        function selectAllWords() {
+            const allKeys = [];
+            document.querySelectorAll('.history-word-card .word-checkbox').forEach(cb => {
+                const key = cb.dataset.key;
+                if (key) {
+                    cb.checked = true;
+                    selectedWords.add(key);
+                    allKeys.push(key);
+                }
+            });
+            document.querySelectorAll('.history-word-card').forEach(card => card.classList.add('selected'));
+            updateSelectedCount();
+        }
+
+        function selectNoneWords() {
+            document.querySelectorAll('.history-word-card .word-checkbox').forEach(cb => {
+                cb.checked = false;
+            });
+            selectedWords.clear();
+            document.querySelectorAll('.history-word-card').forEach(card => card.classList.remove('selected'));
+            updateSelectedCount();
+        }
+
+        function batchDeleteWords() {
+            if (selectedWords.size === 0) {
+                showLearningStatus('请先选择单词');
+                return;
+            }
+            if (confirm(`确定删除选中的 ${selectedWords.size} 个单词历史？`)) {
+                selectedWords.forEach(key => {
+                    delete wordHistory[key];
+                });
+                selectedWords.clear();
+                saveHistoryToStorage();
+                loadHistoryDisplay();
+                showLearningStatus('✅ 批量删除完成');
+            }
+        }
+
+        function updateSelectedCount() {
+            if (selectedCountSpan) {
+                selectedCountSpan.textContent = `已选择 ${selectedWords.size} 个单词`;
+            }
+        }
+
+        // ========== 14. 生词本完整功能 ==========
+        function showCollectionWords() {
+            const list = document.getElementById('collection-words-list');
+            if (!list) return;
+            list.innerHTML = '';
+
+            let collectionWords = [];
+            vocabularyData.forEach(tb => {
+                tb.units.forEach(unit => {
+                    unit.vocabulary.forEach(word => {
+                        const key = getWordKey(word, tb.name, unit.name);
+                        if (collectionSet.has(key)) {
+                            collectionWords.push({
+                                word,
+                                textbook: tb.name,
+                                unit: unit.name,
+                                key
+                            });
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('collection-count').textContent = collectionWords.length;
+
+            if (collectionWords.length === 0) {
+                list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:70px; background:white; border-radius:48px;">
+                                    <i class="fas fa-star" style="font-size:4rem; color:var(--collection-color); opacity:0.5;"></i>
+                                    <p style="margin-top:20px; font-size:1.4rem;">生词本还是空的，快去添加单词吧~</p>
+                                </div>`;
+                return;
+            }
+
+            collectionWords.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'history-word-card mastered';
+                card.style.borderLeftColor = 'var(--collection-color)';
+                card.innerHTML = `
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span class="history-word" style="color:var(--collection-color);">${item.word.word}</span>
+                                        <button class="pronounce-btn" data-word="${item.word.word}"><i class="fas fa-volume-up"></i> 发音</button>
+                                    </div>
+                                    <div class="history-word-source">${item.textbook} · ${item.unit}</div>
+                                    <div class="history-word-meaning">${item.word.basic_meaning || ''}</div>
+                                    <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+                                        <button class="action-btn remove-collection-btn" data-key="${item.key}" style="background:#fee2e2; color:#b91c1c;"><i class="fas fa-trash"></i> 移出生词本</button>
+                                    </div>
+                                `;
+                setupPronounceButton(card.querySelector('.pronounce-btn'), item.word.word); // 设置改进的发音按钮
+                card.querySelector('.remove-collection-btn')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    collectionSet.delete(item.key);
+                    saveCollectionToStorage();
+                    showCollectionWords();
+                    showLearningStatus('➖ 已移出生词本');
+                });
+                list.appendChild(card);
+            });
+        }
+
+        function showAddCollectionModal() {
+            document.getElementById('add-collection-modal').style.display = 'flex';
+            switchCollectionTab('textbook');
+            populateTextbookDropdown();
+        }
+
+        function switchCollectionTab(tab) {
+            const textbookArea = document.getElementById('textbook-select-area');
+            const historyArea = document.getElementById('history-select-area');
+            const tabTextbook = document.getElementById('tab-textbook');
+            const tabHistory = document.getElementById('tab-history');
+
+            if (tab === 'textbook') {
+                textbookArea.style.display = 'block';
+                historyArea.style.display = 'none';
+                tabTextbook.classList.add('active');
+                tabHistory.classList.remove('active');
+                populateTextbookDropdown();
+            } else {
+                textbookArea.style.display = 'none';
+                historyArea.style.display = 'block';
+                tabTextbook.classList.remove('active');
+                tabHistory.classList.add('active');
+                populateHistoryChecklist();
+            }
+        }
+
+        function populateTextbookDropdown() {
+            const select = document.getElementById('select-textbook');
+            if (!select) return;
+            select.innerHTML = '';
+            vocabularyData.forEach((tb, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = tb.name;
+                select.appendChild(opt);
+            });
+            populateUnitDropdown();
+        }
+
+        function populateUnitDropdown() {
+            const tbIndex = document.getElementById('select-textbook').value;
+            const unitSelect = document.getElementById('select-unit');
+            if (!unitSelect) return;
+            unitSelect.innerHTML = '';
+            const textbook = vocabularyData[tbIndex];
+            if (textbook) {
+                textbook.units.forEach((unit, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = unit.name;
+                    unitSelect.appendChild(opt);
+                });
+            }
+            populateWordCheckboxList();
+        }
+
+        function populateWordCheckboxList() {
+            const container = document.getElementById('word-checkbox-list-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const tbIndex = document.getElementById('select-textbook').value;
+            const unitIndex = document.getElementById('select-unit').value;
+            if (tbIndex === undefined || unitIndex === undefined) return;
+
+            const textbook = vocabularyData[tbIndex];
+            if (!textbook) return;
+            const unit = textbook.units[unitIndex];
+            if (!unit) return;
+
+            unit.vocabulary.forEach(word => {
+                const key = getWordKey(word, textbook.name, unit.name);
+                const div = document.createElement('div');
+                div.className = 'word-check-item';
+                div.innerHTML = `
+                                    <input type="checkbox" id="cb_${key}" value="${key}" style="width:20px; height:20px;">
+                                    <label for="cb_${key}">${word.word} — ${word.basic_meaning || ''}</label>
+                                `;
+                container.appendChild(div);
+            });
+        }
+
+        function populateHistoryChecklist() {
+            const container = document.getElementById('history-word-check-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const historyKeys = Object.keys(wordHistory);
+            if (historyKeys.length === 0) {
+                container.innerHTML = '<p style="padding:20px; color:gray;">暂无历史记录</p>';
+                return;
+            }
+
+            historyKeys.forEach(key => {
+                const div = document.createElement('div');
+                div.className = 'word-check-item';
+                div.innerHTML = `
+                                    <input type="checkbox" id="hist_${key}" value="${key}" style="width:20px; height:20px;">
+                                    <label for="hist_${key}">${key.split('|')[2] || key}</label>
+                                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addSelectedWordsToCollection() {
+            const activeTab = document.getElementById('tab-textbook').classList.contains('active') ? 'textbook' : 'history';
+            let addedCount = 0;
+
+            if (activeTab === 'textbook') {
+                const checkboxes = document.querySelectorAll('#word-checkbox-list-container input[type="checkbox"]:checked');
+                checkboxes.forEach(cb => {
+                    const key = cb.value;
+                    if (!collectionSet.has(key)) {
+                        collectionSet.add(key);
+                        addedCount++;
+                    }
+                });
+            } else {
+                const checkboxes = document.querySelectorAll('#history-word-check-list input[type="checkbox"]:checked');
+                checkboxes.forEach(cb => {
+                    const key = cb.value;
+                    if (!collectionSet.has(key)) {
+                        collectionSet.add(key);
+                        addedCount++;
+                    }
+                });
+            }
+
+            if (addedCount > 0) {
+                saveCollectionToStorage();
+                showLearningStatus(`✨ 已添加 ${addedCount} 个单词到生词本`);
+            } else {
+                showLearningStatus('⚠️ 未选择任何新单词');
+            }
+
+            document.getElementById('add-collection-modal').style.display = 'none';
+            if (currentMode === 'collection') showCollectionWords();
+        }
+
+        function startWanderFromCollection() {
+            if (collectionSet.size === 0) {
+                showLearningStatus('生词本为空，无法漫游');
+                return;
+            }
+            // 切换到漫游模式，但标记当前模式为collection，以便generate只取生词本
+            fromCollectionWander = true;
+            currentMode = 'wander';
+            modeSelection.style.display = 'none';
+            unitModeDiv.style.display = 'none';
+            wanderModeDiv.style.display = 'block';
+            historyModeDiv.style.display = 'none';
+            collectionModeDiv.style.display = 'none';
+            if (shuffleBtn) shuffleBtn.style.display = 'none'; // 隐藏随机新词按钮
+            if (settingsBtn) settingsBtn.style.display = 'inline-flex'; // 确保设置按钮可见
+            if (document.getElementById('wander-title')) document.getElementById('wander-title').textContent = '📚 生词本漫游';
+            generateWanderWords();
+        }
+
+        // ========== 15. 漫游设置 ==========
+        function showWanderSettings() {
+            const modal = document.getElementById('wander-settings-modal');
+            if (!modal) return;
+
+            document.getElementById('prevent-recent').checked = wanderSettings.preventRecent;
+            document.getElementById('wander-count-slider').value = wanderSettings.wanderCount;
+            document.getElementById('wander-count-value').textContent = wanderSettings.wanderCount;
+            document.getElementById('hide-chinese-checkbox').checked = wanderSettings.hideChinese;
+            document.getElementById('hide-english-checkbox').checked = wanderSettings.hideEnglish;
+
+            ['unfamiliar', 'somewhat', 'familiar', 'mastered'].forEach(s => {
+                const slider = document.getElementById(`slider-${s}`);
+                const label = document.getElementById(`weight-${s}`);
+                if (slider) {
+                    slider.value = wanderSettings.weights[s];
+                    label.textContent = wanderSettings.weights[s];
+                }
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function hideWanderSettings() {
+            document.getElementById('wander-settings-modal').style.display = 'none';
+        }
+
+        function saveWanderSettings() {
+            wanderSettings.preventRecent = document.getElementById('prevent-recent').checked;
+            wanderSettings.wanderCount = parseInt(document.getElementById('wander-count-slider').value, 10);
+            wanderSettings.hideChinese = document.getElementById('hide-chinese-checkbox').checked;
+            wanderSettings.hideEnglish = document.getElementById('hide-english-checkbox').checked;
+
+            ['unfamiliar', 'somewhat', 'familiar', 'mastered'].forEach(s => {
+                const slider = document.getElementById(`slider-${s}`);
+                if (slider) {
+                    wanderSettings.weights[s] = parseInt(slider.value, 10);
+                }
+            });
+
+            saveSettingsToStorage();
+            hideWanderSettings();
+
+            if (currentMode === 'wander' || currentMode === 'collection') {
+                generateWanderWords();
+            }
+            showLearningStatus('⚙️ 设置已保存');
+        }
+
+        // ========== 16. 重置选择 ==========
+        function resetSelection() {
+            selectedWords.clear();
+        }
+
+        console.log('✅ 第一部分JS加载完成，所有功能就绪');
+    </script>
+</body>
+</html>
